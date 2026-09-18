@@ -95,13 +95,8 @@ class App(ctk.CTk):
         self.main_frame.grid_columnconfigure(2, weight=0)
         self.main_frame.grid_columnconfigure(3, weight=0)
 
-        # ---
-        # --- CRASH FIX ---
-        # ---
-        # The 'text_color_selected' line was removed to fix the crash
-        # on customtkinter 5.2.2. This WILL cause the "invisible text"
-        # bug, but the app will run.
-        #
+        # 'text_color_selected' is intentionally omitted: it crashed on
+        # customtkinter 5.2.2. Not reproduced on customtkinter 6.0.0.
         self.mode_switcher = ctk.CTkSegmentedButton(
             self.main_frame,
             values=["Reference Sort", "Auto-Discovery"],

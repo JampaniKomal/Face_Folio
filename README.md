@@ -9,6 +9,8 @@ This application provides two modes:
 
 Unknown faces are copied to a `_NoMatches` folder.
 
+![Face Folio screenshot](docs/screenshot.png)
+
 ## Table of Contents
 
   - [About](#about)
@@ -19,8 +21,11 @@ Unknown faces are copied to a `_NoMatches` folder.
       - [End Users](#end-users)
       - [Developers](#developers)
   - [Building & Distribution](#building--distribution)
+  - [Testing & Verification](#testing--verification)
+  - [Known Limitations](#known-limitations)
   - [Team](#team)
   - [Technologies](#technologies)
+  - [License](#license)
   - [Acknowledgments](#acknowledgments)
 
 -----
@@ -116,7 +121,12 @@ Notes:
 
   - Python 3.7+: https://www.python.org/
   - `face_recognition` repo & docs: https://github.com/ageitgey/face_recognition
-  - Installing dlib can be tricky on Windows. Pre-built wheels are available at: https://github.com/jloh02/dlib/releases
+  - Installing `dlib` from source on Windows requires a C++ build toolchain
+    (Visual Studio Build Tools + CMake). To skip that, install the prebuilt
+    [`dlib-bin`](https://pypi.org/project/dlib-bin/) package instead
+    (`pip install dlib-bin`), then `pip install face_recognition --no-deps
+    face-recognition-models` — this is the exact combination verified to
+    work in a clean Python 3.11 environment with no build tools installed.
 
 ## Building & Distribution
 
@@ -153,6 +163,42 @@ pyinstaller --noconsole --onefile --name FaceFolio-Setup-v1.0 --icon assets/app_
 
 Output: `dist/FaceFolio-Setup-v1.0.exe`.
 
+## Testing & Verification
+
+The core sorting logic (`src/core/photo_organizer.py`) was verified end-to-end
+by calling `run_reference_sort` and `run_auto_discovery` directly with real
+photos (two different people's official public-domain portraits) rather than
+just launching the GUI:
+
+  - **Reference Sort:** given two reference photos (`Obama.jpg`, `Biden.jpg`)
+    and two matching event photos, each event photo was correctly copied into
+    its matching person's output folder — no misclassifications, no false
+    `_NoMatches`.
+  - **Auto-Discovery:** given the same two event photos with no reference
+    input, the app correctly identified 2 distinct unique faces and saved 2
+    separate portraits to `_Portraits_To_Tag` (did not merge them into one
+    person or split one person into two).
+  - The GUI itself was also launched and driven directly (filling the real
+    input fields and clicking "Start Sorting Photos"), confirming the full
+    pipeline from UI to disk output works, not just the underlying functions.
+
+There is no automated test suite in this repository — the checks above were
+run manually. Adding a `pytest` suite would require bundling real, identifiable
+face photos as fixtures, which raises its own attribution/privacy questions;
+left as a known gap rather than doing that.
+
+## Known Limitations
+
+  - No automated test suite (see Testing & Verification above for how this
+    was actually verified).
+  - The face-match tolerance (`0.65`) is a hardcoded constant in
+    `photo_organizer.py`, not exposed as a UI setting.
+  - Auto-Discovery's "seen faces" list only exists for the duration of one
+    run — there is no persistent face database across separate runs.
+  - Not tested on macOS or Linux, despite `face_recognition`/`dlib` being
+    cross-platform in principle; the installer/uninstaller are Windows-only
+    (PyInstaller `.exe` + Windows Registry entries).
+
 ## Team
 
 Primary Developer: Jampani Komal
@@ -166,6 +212,10 @@ Academic Year: 2024–2025
   - [dlib](http://dlib.net/)
   - [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) (GUI)
   - [PyInstaller](https://pyinstaller.org/) (packaging)
+
+## License
+
+MIT License — see [LICENSE](LICENSE).
 
 ## Acknowledgments
 
