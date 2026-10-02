@@ -1,0 +1,5 @@
+# Lint for real errors only (syntax errors, undefined names, unused imports/vars,
+# placeholder-less f-strings). This project is a desktop GUI app, so style rules
+# are intentionally not enforced.
+[lint]
+select = ["E9", "F"]

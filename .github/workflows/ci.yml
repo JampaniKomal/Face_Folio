@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: python -m pip install --upgrade pip ruff
+
+      # Lint for real errors (syntax / undefined names / unused imports). We do
+      # NOT install dlib + face_recognition here: they need a C++ toolchain and
+      # large model downloads, and the GUI needs a display. These static checks
+      # don't import the modules, so they run without those heavy dependencies.
+      - name: Lint (ruff E9,F)
+        run: ruff check main.py uninstall.py src installer
+
+      - name: Byte-compile all sources
+        run: python -m compileall -q main.py uninstall.py src installer

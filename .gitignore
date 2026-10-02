@@ -13,13 +13,8 @@ venv/
 ENV/
 .venv/
 build/
-# Unignore .exe files in dist folder for LFS tracking
-!dist/
-dist/*
-!dist/FaceFolio/
-dist/FaceFolio/*
-!dist/FaceFolio/*.exe
-!dist/*.exe
+# Build outputs are NOT committed - build them locally (see README "Building & Distribution")
+dist/
 *.egg-info/
 pip-wheel-metadata/
 *.egg

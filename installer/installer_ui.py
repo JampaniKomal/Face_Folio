@@ -546,8 +546,8 @@ class InstallerApp(ctk.CTk):
             self.update_progress(current_step / total_steps, "Creating installation directory...", "")
             try:
                 os.makedirs(self.install_location, exist_ok=True)
-            except PermissionError as e:
-                raise Exception(f"Permission denied. Please choose a different installation location.")
+            except PermissionError:
+                raise Exception("Permission denied. Please choose a different installation location.")
             except Exception as e:
                  raise Exception(f"Could not create directory: {e}")
             current_step += 1
@@ -559,7 +559,7 @@ class InstallerApp(ctk.CTk):
             app_bundle_src = os.path.join(self.source_folder, "FaceFolio")
 
             if not os.path.exists(app_bundle_src):
-                raise Exception(f"Application bundle folder not found inside installer package. Please ensure Step 1 created the 'dist/FaceFolio' folder.")
+                raise Exception("Application bundle folder not found inside installer package. Please ensure Step 1 created the 'dist/FaceFolio' folder.")
 
             # --- DEFENSIVE COPY LOOP FOR SHUTIL.COPYTREE ---
             copied_successfully = False

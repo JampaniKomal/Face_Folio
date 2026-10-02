@@ -8,12 +8,9 @@ import customtkinter as ctk
 from customtkinter import CTkImage 
 import os
 import threading
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 from PIL import Image
 from pathlib import Path
-import time
-import subprocess
-import sys
 
 from core.photo_organizer import run_reference_sort, run_auto_discovery
 
@@ -424,9 +421,13 @@ class App(ctk.CTk):
             self.after(100, lambda: self._show_themed_info("Complete", "Photo sorting finished successfully!"))
             
         except Exception as e:
-            print(f"Error during processing: {e}")
-            self.update_status(f"Error: {e}", 0)
-            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during processing:\n\n{e}"))
+            # Capture the message now: Python deletes the `except ... as e`
+            # binding at the end of this block, but the self.after(...) lambda
+            # runs later, so referencing `e` inside it would raise NameError.
+            error_message = str(e)
+            print(f"Error during processing: {error_message}")
+            self.update_status(f"Error: {error_message}", 0)
+            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during processing:\n\n{error_message}"))
             
         finally:
             self.set_ui_processing_state(False)
@@ -467,9 +468,10 @@ class App(ctk.CTk):
             self.after(100, start_tagger)
 
         except Exception as e:
-            print(f"Error during auto-discovery: {e}")
-            self.update_status(f"Error: {e}", 0)
-            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during discovery:\n\n{e}"))
+            error_message = str(e)  # survive into the deferred self.after(...) lambda
+            print(f"Error during auto-discovery: {error_message}")
+            self.update_status(f"Error: {error_message}", 0)
+            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during discovery:\n\n{error_message}"))
             self.set_ui_processing_state(False)
 
     # ---
@@ -591,9 +593,10 @@ class App(ctk.CTk):
             self.after(100, lambda: self._show_themed_info("Complete", "Photo sorting finished successfully!"))
 
         except Exception as e:
-            print(f"Error during final sort: {e}")
-            self.update_status(f"Error: {e}", 0)
-            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during the final sort:\n\n{e}"))
+            error_message = str(e)  # survive into the deferred self.after(...) lambda
+            print(f"Error during final sort: {error_message}")
+            self.update_status(f"Error: {error_message}", 0)
+            self.after(100, lambda: self._show_themed_error("Error", f"An error occurred during the final sort:\n\n{error_message}"))
             
         finally:
             self.set_ui_processing_state(False)
@@ -623,7 +626,7 @@ class App(ctk.CTk):
             self.event_btn_folder.configure(state=state)
             self.output_btn.configure(state=state)
             self.start_btn.configure(state=state)
-            self.mode_switcher.configure(state=storage)
+            self.mode_switcher.configure(state=state)
             
             self.progress_bar.set(0)
 
@@ -658,7 +661,7 @@ class App(ctk.CTk):
                 self.current_theme_name = new_theme_name
                 self.current_theme = DARK_THEME if new_theme_name == "Dark" else LIGHT_THEME
                 self.update_ui_theme()
-        except Exception as e:
+        except Exception:
             pass
 
     def update_ui_theme(self):

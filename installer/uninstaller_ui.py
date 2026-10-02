@@ -18,12 +18,10 @@ Version: 1.0
 """
 
 import customtkinter as ctk
-import tkinter as tk
 from tkinter import messagebox
 import os
 import shutil
 import json
-import sys
 
 try:
     import winreg

@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 try:
     from ui.main_window import App
 except ImportError as e:
-    print(f"Error: Failed to import main_window.py.")
+    print("Error: Failed to import main_window.py.")
     print(f"Details: {e}")
     root = ctk.CTk()
     root.withdraw()
@@ -87,7 +87,7 @@ def main():
         app.mainloop()
 
     except Exception as e:
-        print(f"Fatal Error: Failed to start application.")
+        print("Fatal Error: Failed to start application.")
         print(f"Details: {e}")
         import tkinter as tk
         root = tk.Tk()

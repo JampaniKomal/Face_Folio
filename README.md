@@ -100,7 +100,13 @@ Face_Folio/
 
 ### End Users
 
-Download and run the built installer: [FaceFolio-Setup-v1.0.exe](dist/FaceFolio-Setup-v1.0.exe). No Python required. The dlib face recognition models will be downloaded automatically on the first run.
+A prebuilt Windows installer is **not committed to the repository** — the
+PyInstaller output (`dist/`) is ~236 MB of binaries, which doesn't belong in
+version control. Build it yourself from source with the three PyInstaller
+commands in [Building & Distribution](#building--distribution) (the result is
+`dist/FaceFolio-Setup-v1.0.exe`), or just run the app from source as described
+under [Developers](#developers). The dlib face-recognition models are downloaded
+automatically on first run.
 
 ### Developers
 
@@ -187,10 +193,25 @@ run manually. Adding a `pytest` suite would require bundling real, identifiable
 face photos as fixtures, which raises its own attribution/privacy questions;
 left as a known gap rather than doing that.
 
+## Recent fixes (2026-10)
+
+  - Fixed a crash in the UI state toggle: `set_ui_processing_state` referenced
+    an undefined `storage` variable (a typo for `state`), so toggling the
+    controls raised `NameError`.
+  - Fixed three error-handler crashes: the "an error occurred" popups are shown
+    via a deferred `self.after(..., lambda: ...)`, but the lambdas referenced the
+    `except ... as e` variable, which Python deletes at the end of the `except`
+    block — so when an error actually occurred, the popup itself raised
+    `NameError`. The message is now captured into a local first.
+  - Removed dead imports and placeholder-less f-strings (ruff `E9,F`), and
+    stopped committing the ~236 MB of PyInstaller build output under `dist/`
+    (now git-ignored; build it from source — see above).
+
 ## Known Limitations
 
-  - No automated test suite (see Testing & Verification above for how this
-    was actually verified).
+  - No automated unit-test suite for the face-matching logic (it needs real,
+    identifiable face photos as fixtures; see Testing & Verification above for
+    how it was verified manually). CI runs lint + byte-compile checks.
   - The face-match tolerance (`0.65`) is a hardcoded constant in
     `photo_organizer.py`, not exposed as a UI setting.
   - Auto-Discovery's "seen faces" list only exists for the duration of one
